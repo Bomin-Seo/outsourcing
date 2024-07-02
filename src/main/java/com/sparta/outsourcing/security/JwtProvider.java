@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @Component
 public class JwtProvider {
-    private final long TOKEN_TIME = 30 * 60 * 1000L; // 30분
+    private final long TOKEN_TIME = 30 * 60 * 100000000000L; // 30분
     private final long REFRESH_TOKEN_TIME = 14 * 24* 60 * 60 * 1000L; // 2주
 
     private final UserDetailsServiceImpl userDetailsService;

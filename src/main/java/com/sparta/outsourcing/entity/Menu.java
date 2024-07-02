@@ -1,10 +1,8 @@
 package com.sparta.outsourcing.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.sparta.outsourcing.dto.MenuDto;
 import com.sparta.outsourcing.enums.StatusEnum;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -42,7 +40,6 @@ public class Menu extends Timestamped{
         this.menuName = menuDto.getMenuName();
     }
     public void delete() {
-        setDeletedAt(LocalDateTime.now());
         setStatus(StatusEnum.DENIED);
     }
 }

@@ -6,7 +6,6 @@ import com.sparta.outsourcing.dto.UserDto;
 import com.sparta.outsourcing.exception.SignUpFailureException;
 import com.sparta.outsourcing.security.UserDetailsImpl;
 import com.sparta.outsourcing.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +49,8 @@ public class UserController {
     UserDetailsImpl userDetails) {
         return userService.updateProfile(userId, profileDto, userDetails.getUser());
     }
-    @PostMapping("/delete/{userId}")
+
+    @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.deleteUser(userId, userDetails.getUser());
     }

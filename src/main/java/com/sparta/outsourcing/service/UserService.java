@@ -1,34 +1,35 @@
 package com.sparta.outsourcing.service;
 
 
-import com.sparta.outsourcing.dto.ProfileDto;
-import com.sparta.outsourcing.dto.ProfileResponseDto;
-import com.sparta.outsourcing.dto.UserDto;
-import com.sparta.outsourcing.entity.Menu;
-import com.sparta.outsourcing.entity.Order;
-import com.sparta.outsourcing.entity.Restaurant;
-import com.sparta.outsourcing.entity.Review;
-import com.sparta.outsourcing.entity.User;
-import com.sparta.outsourcing.enums.UserRoleEnum;
+import com.sparta.outsourcing.dto.*;
+import com.sparta.outsourcing.entity.*;
 import com.sparta.outsourcing.enums.StatusEnum;
+import com.sparta.outsourcing.enums.UserRoleEnum;
 import com.sparta.outsourcing.exception.AlreadySignupException;
+import com.sparta.outsourcing.exception.InvalidAccessException;
 import com.sparta.outsourcing.exception.UserNotFoundException;
 import com.sparta.outsourcing.repository.OrderRepository;
 import com.sparta.outsourcing.repository.RestaurantRepository;
 import com.sparta.outsourcing.repository.ReviewRepository;
 import com.sparta.outsourcing.repository.UserRepository;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -49,41 +50,32 @@ public class UserService {
                     "already.exist", null, "중복된 사용자가 존재합니다.", Locale.getDefault()
             ));
         }
+
         User user = new User(
                 userDto.getUsername(), bCryptPasswordEncoder.encode(userDto.getPassword()),
                 userDto.getNickname(), userDto.getUserinfo());
-        if(roleId == 1L){
 
+        if(roleId == 1L){
             user.setRole(UserRoleEnum.ROLE_USER);
         }else if(roleId == 2L){
             user.setRole(UserRoleEnum.ROLE_ADMIN);
         }else {return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 권한입니다.");}
 
         userRepository.save(user);
-        return ResponseEntity.status(HttpStatus.OK).body("가입 완료\n"+"⣿⣿⣿⣿⣿⣿⣿⠟⠋⠉⠁⠈⠉⠙⠻⢿⡿⠿⠛⠋⠉⠙⠛⢿⣿⣿⣿⣿⣿⣿\n"+
-                "⣿⣿⣿⣿⣿⠟⠁⠀⠀⢀⣀⣀⣀⣀⡀⠀⢆⠀⠀⠀⠀⠀⠀⠀⢻⣿⣿⣿⣿⣿\n"+
-                "⣿⣿⣿⣿⠃⠀⠀⠠⠊⠁⠀⠀⠀⠀⠈⠑⠪⡖⠒⠒⠒⠒⠒⠒⠶⠛⠿⣿⣿⣿\n"+
-                "⣿⣿⡿⡇⠀⠀⠀⠀⠀⠀⡠⢔⡢⠍⠉⠉⠩⠭⢑⣤⣔⠲⠤⠭⠭⠤⠴⢊⡻⣿\n"+
-                "⡿⠁⢀⠇⠀⠀⠀⣤⠭⠓⠊⣁⣤⠂⠠⢀⡈⠱⣶⣆⣠⣴⡖⠁⠂⣀⠈⢷⣮⣹\n"+
-                "⠁⠀⠀⠀⠀⠀⠀⠈⠉⢳⣿⣿⣿⡀⠀⠀⢀⣀⣿⡿⢿⣿⣇⣀⣥⣤⠤⢼⣿⣿\n"+
-                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡟⠑⠚⢹⡟⠉⣑⠒⢺⡇⡀⠀⡹⠀⠀⣀⣴⣽⣿⣿\n"+
-                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⡇⠀⠀⣿⠒⠉⠀⠀⢠⠃⠈⠙⠻⣍⠙⢻⡻⣿⣿⣿\n"+
-                "⠀⠀⠀⠀⠀⠀⠀⠀⣀⣘⡄⠀⠀⢸⡇⠀⠀⠀⠘⡇⠀⠀⠀⠘⡄⠀⢱⢸⣿⣿\n"+
-                "⠀⠀⠀⠀⠠⡀⠀⠾⣟⣻⣛⠷⣶⣼⣥⣀⣀⣀⠀⢧⠀⠀⠀⠠⣧⣀⣼⣴⢽⣿\n"+
-                "⠀⠀⠀⠀⠀⠈⠉⠁⠀⠹⡙⠛⠷⣿⣭⣯⣭⣟⣛⣿⣿⣿⣛⣛⣿⣭⣭⣾⣿⣿\n"+
-                "⠀⠀⠀⠀⠀⠀⠀⠀⠀⠸⡀⠀⠀⣇⠀⠉⠉⠉⡏⠉⠙⠛⠛⡿⣻⣯⣷⣿⣿⣿\n"+
-                "⣶⣤⣀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⢸⠀⠀⠀⡸⠁⣠⣴⣶⣿⣿⣿⣿⣿⣿⣿⣿\n"+
-                "⣿⣿⣿⣿⣶⣶⣦⣤⣤⣤⣷⣤⣄⣈⣆⣤⣤⣧⣶⣷⣿⡻⣿⣿⣿⣿⣿⣿⣿⣿\n"+
-                "⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⢿⣿⣿⣿⣿⣿⣿");
+        return ResponseEntity.status(HttpStatus.OK).body("가입 완료");
     }
 
     @Transactional(readOnly = true)
     public ResponseEntity<ProfileResponseDto> getProfile(Long userId) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사용자가 없습니다!");
+            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
         }
+
         ProfileResponseDto profileResponseDto = new ProfileResponseDto(user.get().getNickname(), user.get().getUserinfo());
+        profileResponseDto.setLikedRestaurantCount(user.get().getLikedRestaurantCount());
+        profileResponseDto.setLikedReviewCount(user.get().getLikedReviewCount());
+
         return ResponseEntity.status(HttpStatus.OK).body(profileResponseDto);
     }
 
@@ -93,7 +85,8 @@ public class UserService {
 
         if (user.getRole().equals(UserRoleEnum.ROLE_USER) || user.getRole().equals(UserRoleEnum.ROLE_ADMIN)) {
             if(!user.getId().equals(userId)){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("다른 유저를 수정할 수 없습니다.");
+                throw new InvalidAccessException(messageSource.getMessage(
+                        "invalid.access", null, "적합하지 않은 접근입니다.", Locale.getDefault()));
             }
             if(validatePassword(profileDto.getPassword(),user)){
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("최근 3번안에 사용한 비밀번호는 사용할 수 없습니다.");
@@ -167,4 +160,60 @@ public class UserService {
         }
         return false;
     }
+    @Transactional
+    public ResponseEntity<String> followUser(User user, Long followedUserId) {
+
+        Optional<User> followUser = userRepository.findById(followedUserId);
+        if (followUser.isEmpty()) {
+            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
+        }
+
+        if (user.getUsername().equals(followUser.get().getUsername())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("본인에게는 팔로우를 할 수 없습니다.");
+        }
+
+        user.follow(followUser.get());
+        userRepository.save(user);
+
+        return ResponseEntity.status(HttpStatus.OK).body("팔로우 완료");
+    }
+
+    // 언팔로우 기능
+    @Transactional
+    public ResponseEntity<String> unfollowUser(Long userId, Long followedUserId) {
+        Optional<User> currentUserOptional = userRepository.findById(userId);
+        Optional<User> followedUserOptional = userRepository.findById(followedUserId);
+
+        if (currentUserOptional.isEmpty() || followedUserOptional.isEmpty()) {
+            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
+        }
+
+        User currentUser = currentUserOptional.get();
+        User followedUser = followedUserOptional.get();
+
+        if (!currentUser.isFollowing(followedUser)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 유저를 팔로우하고 있지 않습니다.");
+        }
+
+        currentUser.unfollow(followedUser);
+        userRepository.save(currentUser);
+
+        return ResponseEntity.status(HttpStatus.OK).body("언팔로우 완료");
+    }
+
+    // 팔로우 여부 확인
+    public boolean isUserFollowing(Long userId, Long followedUserId) {
+        Optional<User> currentUserOptional = userRepository.findById(userId);
+        Optional<User> followedUserOptional = userRepository.findById(followedUserId);
+
+        if (currentUserOptional.isEmpty() || followedUserOptional.isEmpty()) {
+            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
+        }
+
+        User currentUser = currentUserOptional.get();
+        User followedUser = followedUserOptional.get();
+
+        return currentUser.isFollowing(followedUser);
+    }
+
 }

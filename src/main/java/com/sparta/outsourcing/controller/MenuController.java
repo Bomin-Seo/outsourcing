@@ -26,25 +26,24 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    @PostMapping("/{restaurantId}/add")
+    @PostMapping("/{restaurantId}")
     public ResponseEntity<String> addMenu(@Valid @RequestBody MenuDto menuDto,
                                           @PathVariable("restaurantId") Long restaurantId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-
         return menuService.addMenu(restaurantId, menuDto, userDetails.getUser());
     }
 
-    @GetMapping("/{restaurantId}/get")
+    @GetMapping("/{restaurantId}")
     public ResponseEntity<List<MenuDto>> getMenu(@PathVariable("restaurantId") Long restaurantId) {
         return menuService.getMenus(restaurantId);
     }
 
-    @PatchMapping("/{restaurantId}/update/{menuId}")
+    @PatchMapping("/{restaurantId}/{menuId}")
     public ResponseEntity<String> updateMenu(@Valid @RequestBody MenuDto menuDto,
                                              @PathVariable("restaurantId") Long restaurantId, @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable("menuId") Long menuId) {
         return menuService.updateMenu(restaurantId, menuDto, userDetails.getUser(),menuId);
     }
 
-    @DeleteMapping("/{restaurantId}/delete/{menuId}")
+    @DeleteMapping("/{restaurantId}/{menuId}")
     public ResponseEntity<String> deleteMenu(@PathVariable("restaurantId") Long restaurantId, @AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Long menuId) {
         return menuService.deleteMenu(restaurantId, userDetails.getUser(), menuId);
     }

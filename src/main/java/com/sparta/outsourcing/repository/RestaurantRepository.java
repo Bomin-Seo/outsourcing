@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+public interface RestaurantRepository extends JpaRepository<Restaurant, Long>, RestaurantRepositoryQuery {
     Page<Restaurant> findAllByOrderByCreatedAtDesc(Pageable pageable);
     List<Restaurant> findByUserId(Long id);
     Optional<Restaurant> findByIdAndStatus(Long id, StatusEnum status);

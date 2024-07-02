@@ -76,7 +76,7 @@ public class ReviewService {
     }
 
     private ReviewDto convertToDto(Review review) {
-        return new ReviewDto(review.getOrder().getOrderId(), review.getContent());
+        return new ReviewDto(review.getOrder().getOrderId(), review.getContent(), review.getLikes());
     }
 
     public ResponseEntity<String> updateReview(Long reviewId, ReviewDto reviewDto) {

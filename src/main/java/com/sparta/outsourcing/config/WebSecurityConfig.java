@@ -94,12 +94,10 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/api/user/signup/**","/api/auth/login","/api/auth/reissue").permitAll()
-                        .requestMatchers("/api/restaurant/menu/","/api/restaurant/delete/",
-                                "/api/restaurant/","/api/menu/add","api/menu/","api/menu/delete/").hasAuthority(UserRoleEnum.ROLE_ADMIN.name())
+                        .requestMatchers("/api/restaurant/menu/","/api/restaurant/").hasAuthority(UserRoleEnum.ROLE_ADMIN.name())
                         // 서버 단에서 에러가 발생시 아래 url이 에러창을 띄워준다
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
-
         );
 
         http.exceptionHandling(auth -> {

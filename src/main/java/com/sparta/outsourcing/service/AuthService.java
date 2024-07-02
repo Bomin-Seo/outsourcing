@@ -25,15 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AuthService implements LogoutHandler {
-    /**
-     * 관련 클래스 호출
-     */
+
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtProvider tokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
-
-
 
     /**
      * 토큰 재발급 메서드

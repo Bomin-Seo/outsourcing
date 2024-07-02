@@ -7,7 +7,10 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -41,6 +44,9 @@ public class User extends Timestamped {
     @Enumerated(EnumType.STRING)
     private UserRoleEnum role;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Restaurant> restaurants = new HashSet<>();
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> deniedPassword = new ArrayList<>(3);
 
@@ -52,7 +58,18 @@ public class User extends Timestamped {
     private boolean expired = true;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RestaurantLike> restaurantLikes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewLike> reviewLikes = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "user_follows", joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_user_id"))
+    private Set<User> follows = new HashSet<>();
+
+    @ManyToMany(mappedBy = "follows", fetch = FetchType.EAGER)
+    private Set<User> followers = new HashSet<>();
 
     public User(String username, String password, String nickname, String userinfo) {
         this.username = username;
@@ -85,5 +102,46 @@ public class User extends Timestamped {
         this.status = StatusEnum.DENIED;
         this.setDeletedAt(LocalDateTime.now());
     }
+    // 내가 좋아요한 게시글 수
+    public int getLikedRestaurantCount() {
+        return this.restaurantLikes.size();
+    }
 
+    // 내가 좋아요한 댓글 수
+    public int getLikedReviewCount() {
+        return this.reviewLikes.size();
+    }
+
+    // 팔로우 기능
+    public void follow(User user) {
+        if (user == null || user.equals(this)) {
+            return;
+        }
+        this.follows.add(user);
+        user.followers.add(this);
+    }
+
+    // 언팔로우 기능
+    public void unfollow(User user) {
+        if (user == null || user.equals(this)) {
+            return;
+        }
+        this.follows.remove(user);
+        user.followers.remove(this);
+    }
+
+    // 팔로우 여부 확인
+    public boolean isFollowing(User user) {
+        return this.follows.contains(user);
+    }
+
+    // 내가 팔로우하는 사용자 목록 조회
+    public Set<User> getFollowingUsers() {
+        return this.follows;
+    }
+
+    // 나를 팔로우하는 사용자 목록 조회
+    public Set<User> getFollowerUsers() {
+        return this.followers;
+    }
 }

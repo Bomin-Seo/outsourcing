@@ -1,15 +1,12 @@
 package com.sparta.outsourcing.entity;
 
-import com.sparta.outsourcing.dto.MenuDto;
 import com.sparta.outsourcing.enums.StatusEnum;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +32,12 @@ public class Restaurant extends Timestamped {
     private StatusEnum status = StatusEnum.ACTIVE;
 
     @ManyToOne
-    @JoinColumn(name="user_id", nullable = false) // 카멜케이스 사용, 외래키명 변경
+    @JoinColumn(name="user_id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Menu> menus = new ArrayList<>();
+
     @OneToMany(mappedBy = "restaurant", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 

@@ -41,6 +41,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({NotFoundObjException.class})
+    public ResponseEntity<RestApiException> NotFoundObjExceptionHandler(NotFoundObjException ex) {
+        RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.BAD_REQUEST.value());
+        return new ResponseEntity<>(restApiException, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({InvalidAccessException.class})
     public ResponseEntity<RestApiException> InvalidAccessExceptionHandler(InvalidAccessException ex) {
         RestApiException restApiException = new RestApiException(ex.getMessage(), HttpStatus.UNAUTHORIZED.value());
