@@ -50,7 +50,7 @@ public class LikeController {
             @PathVariable("userId") Long userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "createdAt") String sortBy) {
+            @RequestParam(defaultValue = "created_at") String sortBy) {
 
         if (contentType.equalsIgnoreCase("RESTAURANT")) {
             List<RestaurantDto> likedRestaurants = likeService.getLikedRestaurant(userId, page, size, sortBy);

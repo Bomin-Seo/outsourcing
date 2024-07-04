@@ -16,9 +16,17 @@ public class ProfileResponseDto {
     @Setter
     private int likedReviewCount;
 
+    private Long follwers;
+
     public ProfileResponseDto(String nickname, String userinfo) {
         this.nickname = nickname;
         this.userinfo = userinfo;
+    }
+
+    public ProfileResponseDto(String nickname, String userinfo, Long follwers) {
+        this.nickname = nickname;
+        this.userinfo = userinfo;
+        this.follwers = follwers;
     }
 
 }

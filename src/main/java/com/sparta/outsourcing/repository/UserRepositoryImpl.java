@@ -5,6 +5,7 @@ import com.sparta.outsourcing.entity.QUser;
 import com.sparta.outsourcing.entity.User;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -27,5 +28,14 @@ public class UserRepositoryImpl implements UserRepositoryQuery {
                 .where(user.refreshtoken.eq(refreshToken))
                 .fetchOne();
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<User> findFamoususerByFollowers() {
+        QUser user = QUser.user;
+        return jpaQueryFactory.selectFrom(user)
+                .orderBy(user.followers.size().desc())
+                .limit(10)
+                .fetch();
     }
 }

@@ -27,8 +27,8 @@ public class FollowController {
     }
 
     @PostMapping("/unfollow/{userId}")
-    public ResponseEntity<String> unfollowUser(@PathVariable("userId") Long userId, @RequestParam("followedUserId") Long followedUserId) {
-        return userService.unfollowUser(userId, followedUserId);
+    public ResponseEntity<String> unfollowUser(@PathVariable("userId") Long userId,  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return userService.unfollowUser(userId, userDetails.getUser());
     }
 
     @GetMapping("/follower/{userId}")

@@ -20,6 +20,11 @@ public class ReviewController {
         return reviewService.addReview(reviewDto);
     }
 
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ReviewDto> getReview(@PathVariable("reviewId") Long reviewId) {
+        return reviewService.getReview(reviewId);
+    }
+
     @GetMapping
     public ResponseEntity<List<ReviewDto>> getAllReviews(@RequestParam(name = "page", defaultValue = "0") int page,
                                                          @RequestParam(name = "size", defaultValue = "5") int size) {

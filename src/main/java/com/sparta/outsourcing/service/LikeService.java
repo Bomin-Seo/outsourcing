@@ -32,7 +32,7 @@ public class LikeService {
     private final MessageSource messageSource;
 
     public LikeResponseDto updateRestaurantLike(Long contentId, User user) {
-        Restaurant restaurant = restaurantRepository.findById(contentId).orElseThrow(() -> new RuntimeException("식당이 존재하지 않습니다."));
+        Restaurant restaurant = restaurantRepository.findById(contentId).orElseThrow(() -> new RuntimeException("해당 식당이 존재하지 않습니다."));
 
         if (user.getUsername().equals(restaurant.getUser().getUsername())) {
             throw new LikeSelfException(messageSource.getMessage(
@@ -74,7 +74,7 @@ public class LikeService {
     public List<RestaurantDto> getLikedRestaurant(Long userId, int page, int size, String sortBy) {
         userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("해당 유저가 없습니다."));
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("username").descending());
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).descending());
 
         List<Restaurant> followRestaurants = restaurantRepository.findLikedRestaurantsByUserId(userId, pageable);
 

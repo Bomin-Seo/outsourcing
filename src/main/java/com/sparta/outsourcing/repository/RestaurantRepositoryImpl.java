@@ -23,6 +23,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryQuery {
                 .leftJoin(restaurantLike.restaurant, restaurant)
                 .where(user.id.eq(userId)
                         .and(restaurantLike.Liked.isTrue()))
+                .orderBy(restaurant.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -38,6 +39,7 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryQuery {
                 .leftJoin(restaurant.user, followedUser)
                 .leftJoin(followedUser.followers, user)
                 .where(user.id.eq(userId))
+                .orderBy(restaurant.createdAt.desc(), followedUser.username.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

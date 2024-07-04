@@ -15,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,16 +34,22 @@ public class UserController {
             StringBuilder errorMessage = new StringBuilder();
             for (FieldError fieldError : fieldErrors) {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-                errorMessage.append(fieldError.getDefaultMessage()).append(" ");
+                errorMessage.append(fieldError.getDefaultMessage());
             }
             throw new SignUpFailureException(errorMessage.toString().trim());
         }
         return userService.signUp(userDto, roleId);
     }
 
+
     @GetMapping("/{userId}")
     public ResponseEntity<ProfileResponseDto> getProfile(@PathVariable("userId") Long userId) {
         return userService.getProfile(userId);
+    }
+
+    @GetMapping("/top10")
+    public List<ProfileResponseDto> getTop10User() {
+        return userService.getTop10User();
     }
 
     @PatchMapping("/{userId}")

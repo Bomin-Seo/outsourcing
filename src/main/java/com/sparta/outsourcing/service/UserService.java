@@ -38,7 +38,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final MessageSource messageSource;
     private final OrderRepository orderRepository;
-    private final ReviewRepository reviewRepository;
     private final RestaurantRepository restaurantRepository;
 
 
@@ -50,7 +49,6 @@ public class UserService {
                     "already.exist", null, "중복된 사용자가 존재합니다.", Locale.getDefault()
             ));
         }
-
         User user = new User(
                 userDto.getUsername(), bCryptPasswordEncoder.encode(userDto.getPassword()),
                 userDto.getNickname(), userDto.getUserinfo());
@@ -160,6 +158,7 @@ public class UserService {
         }
         return false;
     }
+
     @Transactional
     public ResponseEntity<String> followUser(User user, Long followedUserId) {
 
@@ -178,42 +177,35 @@ public class UserService {
         return ResponseEntity.status(HttpStatus.OK).body("팔로우 완료");
     }
 
-    // 언팔로우 기능
     @Transactional
-    public ResponseEntity<String> unfollowUser(Long userId, Long followedUserId) {
-        Optional<User> currentUserOptional = userRepository.findById(userId);
-        Optional<User> followedUserOptional = userRepository.findById(followedUserId);
+    public ResponseEntity<String> unfollowUser(Long userId, User user) {
+        Optional<User> followedUserOptional = userRepository.findById(userId);
 
-        if (currentUserOptional.isEmpty() || followedUserOptional.isEmpty()) {
+        if (followedUserOptional.isEmpty()) {
             throw new UserNotFoundException("유저를 찾을 수 없습니다.");
         }
 
-        User currentUser = currentUserOptional.get();
         User followedUser = followedUserOptional.get();
 
-        if (!currentUser.isFollowing(followedUser)) {
+        if (!user.isFollowing(followedUser)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("해당 유저를 팔로우하고 있지 않습니다.");
         }
 
-        currentUser.unfollow(followedUser);
-        userRepository.save(currentUser);
+        user.unfollow(followedUser);
+        userRepository.save(user);
 
         return ResponseEntity.status(HttpStatus.OK).body("언팔로우 완료");
     }
 
-    // 팔로우 여부 확인
-    public boolean isUserFollowing(Long userId, Long followedUserId) {
-        Optional<User> currentUserOptional = userRepository.findById(userId);
-        Optional<User> followedUserOptional = userRepository.findById(followedUserId);
+    public List<ProfileResponseDto> getTop10User() {
+        List<User> top10Users = userRepository.findFamoususerByFollowers();
 
-        if (currentUserOptional.isEmpty() || followedUserOptional.isEmpty()) {
-            throw new UserNotFoundException("유저를 찾을 수 없습니다.");
-        }
-
-        User currentUser = currentUserOptional.get();
-        User followedUser = followedUserOptional.get();
-
-        return currentUser.isFollowing(followedUser);
+        return top10Users.stream()
+                .map(user-> new ProfileResponseDto(
+                        user.getNickname(),
+                        user.getUserinfo(),
+                        (long) user.getFollowers().size()
+                ))
+                .collect(Collectors.toList());
     }
-
 }

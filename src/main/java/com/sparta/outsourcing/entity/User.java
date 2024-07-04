@@ -6,10 +6,7 @@ import com.sparta.outsourcing.enums.StatusEnum;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -93,6 +90,20 @@ public class User extends Timestamped {
         }
         deniedPassword.add(password);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
     //토큰 값 초기화
     public void updateRefreshToken(String refreshToken) {
         this.refreshtoken = refreshToken;
@@ -132,6 +143,8 @@ public class User extends Timestamped {
 
     // 팔로우 여부 확인
     public boolean isFollowing(User user) {
+        System.out.println(this.follows);
+        System.out.println(user);
         return this.follows.contains(user);
     }
 

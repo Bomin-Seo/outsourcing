@@ -64,6 +64,12 @@ public class ReviewService {
         }
     }
 
+    public ResponseEntity<ReviewDto> getReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException("해당 리뷰가 존재하지 않습니다."));
+        ReviewDto reviewDto = convertToDto(review);
+        return ResponseEntity.status(HttpStatus.OK).body(reviewDto);
+    }
+
     public ResponseEntity<List<ReviewDto>> getAllReviews(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
@@ -124,5 +130,6 @@ public class ReviewService {
             return ResponseEntity.notFound().build();
         }
     }
+
 
 }

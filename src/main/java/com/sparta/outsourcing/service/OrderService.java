@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -51,12 +50,11 @@ public class OrderService {
         }
 
         checkRestaurant(menuList);
-        List<String> menus = getMenus(menuList);
+        List<String> menus = getMenus(menuList, restaurantId);
         int totalPrice = getTotalPrice(menuList);
 
         Order order = new Order();
         order.setUser(user);
-//        order.setOrderStatus("orderStatus");
         order.setRestaurant(restaurant);
         order.setMenuList(menus);
         order.setTotalPrice(totalPrice);
@@ -88,7 +86,7 @@ public class OrderService {
         }
 
         checkRestaurant(menuList);
-        List<String> menus = getMenus(menuList);
+        List<String> menus = getMenus(menuList, order.getRestaurant().getId());
         int totalPrice = getTotalPrice(menuList);
 
         order.setMenuList(menus);
@@ -132,10 +130,14 @@ public class OrderService {
 
 
     //주문 메뉴 목록
-    private List<String> getMenus(List<OrderRequestDto> menuList) {
+    private List<String> getMenus(List<OrderRequestDto> menuList, Long restaurantId) {
         List<String> menus = new ArrayList<>();
         for (OrderRequestDto requestDto : menuList) {
             Menu menu = findMenuById(requestDto.getMenuId());
+            if (!menu.getRestaurant().getId().equals(restaurantId)) {
+                throw new InvalidAccessException(messageSource.getMessage(
+                        "invalid.access", null, "적합하지 않은 접근입니다.", Locale.getDefault()));
+            }
             String count = Integer.toString(requestDto.getMenuCount());
             menus.add(menu.getMenuName() + " 수량: " + count );
         }
@@ -148,7 +150,7 @@ public class OrderService {
         int totalPrice = 0;
         for (OrderRequestDto requestDto : menuList) {
             Menu menu = findMenuById(requestDto.getMenuId());
-            totalPrice += menu.getPrice()*requestDto.getMenuCount();
+            totalPrice += (int) (menu.getPrice()*requestDto.getMenuCount());
         }
         return totalPrice;
     }
