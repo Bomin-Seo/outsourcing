@@ -3,6 +3,8 @@ package com.sparta.outsourcing.repository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.outsourcing.entity.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -44,4 +46,24 @@ public class RestaurantRepositoryImpl implements RestaurantRepositoryQuery {
                 .limit(pageable.getPageSize())
                 .fetch();
     }
+
+    @Override
+    public Page<Restaurant> filteringRestaurant(FollowerRestaurantSearCond cond, Pageable pageable) {
+        QRestaurant restaurant = QRestaurant.restaurant;
+        QUser user = QUser.user;
+
+        var query = jpaQueryFactory.selectFrom(restaurant)
+                .leftJoin(restaurant.user, user)
+                .where(user.role.eq(cond.getRole())
+                        .and(user.username.eq(cond.getAuthor())))
+                .orderBy(restaurant.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        List<Restaurant> restaurants = query.fetch();
+        long total = query.fetchCount();
+
+        return new PageImpl<>(restaurants, pageable, total);
+    }
+
 }

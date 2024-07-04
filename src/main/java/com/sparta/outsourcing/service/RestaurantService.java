@@ -1,11 +1,14 @@
 package com.sparta.outsourcing.service;
 
 import com.sparta.outsourcing.dto.RestaurantDto;
+import com.sparta.outsourcing.dto.RestaurantResponseDto;
 import com.sparta.outsourcing.entity.Restaurant;
 import com.sparta.outsourcing.entity.User;
 import com.sparta.outsourcing.enums.StatusEnum;
+import com.sparta.outsourcing.enums.UserRoleEnum;
 import com.sparta.outsourcing.exception.InvalidAccessException;
 import com.sparta.outsourcing.exception.NotFoundObjException;
+import com.sparta.outsourcing.repository.FollowerRestaurantSearCond;
 import com.sparta.outsourcing.repository.RestaurantRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Locale;
@@ -87,5 +92,12 @@ public class RestaurantService {
     private RestaurantDto convertToDto(Restaurant restaurant) {
         return new RestaurantDto(restaurant.getRestaurantName(), restaurant.getRestaurantInfo(),
                 restaurant.getPhoneNumber(), restaurant.getLikes());
+    }
+
+
+    public Page<RestaurantResponseDto> getFilteredRestaurants(FollowerRestaurantSearCond cond, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Restaurant> restaurants = restaurantRepository.filteringRestaurant(cond, pageable);
+        return restaurants.map(RestaurantResponseDto::createRestaurantResponseDto);
     }
 }
