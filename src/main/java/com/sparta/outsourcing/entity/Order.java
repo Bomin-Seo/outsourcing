@@ -33,10 +33,6 @@ public class Order extends Timestamped{
     @Enumerated(EnumType.STRING)
     private StatusEnum status = StatusEnum.ACTIVE;
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime modifiedAt;
-
     private String orderStatus;
 
     @ManyToOne

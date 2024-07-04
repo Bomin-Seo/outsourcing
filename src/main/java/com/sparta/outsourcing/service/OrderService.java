@@ -6,32 +6,27 @@ import com.sparta.outsourcing.entity.Menu;
 import com.sparta.outsourcing.entity.Order;
 import com.sparta.outsourcing.entity.Restaurant;
 import com.sparta.outsourcing.entity.User;
-import com.sparta.outsourcing.enums.UserRoleEnum;
 import com.sparta.outsourcing.exception.InvalidAccessException;
 import com.sparta.outsourcing.repository.MenuRepository;
 import com.sparta.outsourcing.repository.OrderRepository;
 import com.sparta.outsourcing.repository.RestaurantRepository;
-import com.sparta.outsourcing.repository.UserRepository;
 import com.sparta.outsourcing.security.UserDetailsImpl;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @Transactional
 public class OrderService {
-    private OrderRepository orderRepository;
-    private MenuRepository menuRepository;
-    private RestaurantRepository restaurantRepository;
+    private final OrderRepository orderRepository;
+    private final MenuRepository menuRepository;
+    private final RestaurantRepository restaurantRepository;
     private final MessageSource messageSource;
 
     public OrderService(OrderRepository orderRepository, MenuRepository menuRepository, RestaurantRepository restaurantRepository, MessageSource messageSource) {
@@ -55,16 +50,14 @@ public class OrderService {
         }
 
         checkRestaurant(menuList);
-        List<String> menus = getMenus(menuList);
+        List<String> menus = getMenus(menuList, restaurantId);
         int totalPrice = getTotalPrice(menuList);
 
         Order order = new Order();
         order.setUser(user);
-//        order.setOrderStatus("orderStatus");
         order.setRestaurant(restaurant);
         order.setMenuList(menus);
         order.setTotalPrice(totalPrice);
-        order.setCreatedAt(LocalDateTime.now());
         orderRepository.save(order);
         return OrderResponseDto.toDto(order);
     }
@@ -88,17 +81,16 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new IllegalArgumentException("주문을 찾을 수 없습니다."));
 
-        if (order.getUser().getId() != user.getId()) {
+        if (!Objects.equals(order.getUser().getId(), user.getId())) {
             throw new IllegalArgumentException("주문한 사람만 수정할 수 있습니다");
         }
 
         checkRestaurant(menuList);
-        List<String> menus = getMenus(menuList);
+        List<String> menus = getMenus(menuList, order.getRestaurant().getId());
         int totalPrice = getTotalPrice(menuList);
 
         order.setMenuList(menus);
         order.setTotalPrice(totalPrice);
-        order.setModifiedAt(LocalDateTime.now());
         orderRepository.save(order);
         return OrderResponseDto.toDto(order);
     }
@@ -138,10 +130,14 @@ public class OrderService {
 
 
     //주문 메뉴 목록
-    private List<String> getMenus(List<OrderRequestDto> menuList) {
+    private List<String> getMenus(List<OrderRequestDto> menuList, Long restaurantId) {
         List<String> menus = new ArrayList<>();
         for (OrderRequestDto requestDto : menuList) {
             Menu menu = findMenuById(requestDto.getMenuId());
+            if (!menu.getRestaurant().getId().equals(restaurantId)) {
+                throw new InvalidAccessException(messageSource.getMessage(
+                        "invalid.access", null, "적합하지 않은 접근입니다.", Locale.getDefault()));
+            }
             String count = Integer.toString(requestDto.getMenuCount());
             menus.add(menu.getMenuName() + " 수량: " + count );
         }
@@ -154,7 +150,7 @@ public class OrderService {
         int totalPrice = 0;
         for (OrderRequestDto requestDto : menuList) {
             Menu menu = findMenuById(requestDto.getMenuId());
-            totalPrice += menu.getPrice()*requestDto.getMenuCount();
+            totalPrice += (int) (menu.getPrice()*requestDto.getMenuCount());
         }
         return totalPrice;
     }

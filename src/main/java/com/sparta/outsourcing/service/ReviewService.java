@@ -64,6 +64,12 @@ public class ReviewService {
         }
     }
 
+    public ResponseEntity<ReviewDto> getReview(Long reviewId) {
+        Review review = reviewRepository.findById(reviewId).orElseThrow(() -> new RuntimeException("해당 리뷰가 존재하지 않습니다."));
+        ReviewDto reviewDto = convertToDto(review);
+        return ResponseEntity.status(HttpStatus.OK).body(reviewDto);
+    }
+
     public ResponseEntity<List<ReviewDto>> getAllReviews(int page, int size) {
 
         Pageable pageable = PageRequest.of(page, size);
@@ -76,7 +82,7 @@ public class ReviewService {
     }
 
     private ReviewDto convertToDto(Review review) {
-        return new ReviewDto(review.getOrder().getOrderId(), review.getContent());
+        return new ReviewDto(review.getOrder().getOrderId(), review.getContent(), review.getLikes());
     }
 
     public ResponseEntity<String> updateReview(Long reviewId, ReviewDto reviewDto) {
@@ -124,5 +130,6 @@ public class ReviewService {
             return ResponseEntity.notFound().build();
         }
     }
+
 
 }

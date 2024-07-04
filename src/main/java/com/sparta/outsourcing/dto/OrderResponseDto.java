@@ -8,9 +8,9 @@ import java.util.List;
 
 @Getter
 public class OrderResponseDto {
-    private String userName;
-    private int totalPrice;
-    private List<String> menuList;
+    private final String userName;
+    private final int totalPrice;
+    private final List<String> menuList;
 
     public OrderResponseDto(String userName, List<String> menuList, int totalPrice) {
         this.userName = userName;

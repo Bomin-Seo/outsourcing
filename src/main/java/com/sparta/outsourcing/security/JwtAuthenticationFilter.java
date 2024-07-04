@@ -53,7 +53,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             loginRequestDto = objectMapper.readValue(request.getInputStream(), LoginRequestDto.class);
 
             Optional<User> user = userRepository.findByUsername(loginRequestDto.getUsername());
-            if(null != user) {
+            if(user.isPresent()) {
                 if(user.get().getStatus() == DENIED){
                     log.info("삭제된 사용자입니다");
                     throw new IllegalArgumentException("삭제된 사용자입니다.");
@@ -65,8 +65,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             }
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                     loginRequestDto.getUsername(),loginRequestDto.getPassword());
-            Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            return authentication;
+            return authenticationManager.authenticate(authenticationToken);
         } catch (IOException e) {
             log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());

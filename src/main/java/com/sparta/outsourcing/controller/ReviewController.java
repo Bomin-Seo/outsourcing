@@ -1,36 +1,33 @@
 package com.sparta.outsourcing.controller;
 
 import com.sparta.outsourcing.dto.ReviewDto;
-import com.sparta.outsourcing.entity.Review;
 import com.sparta.outsourcing.service.ReviewService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequiredArgsConstructor
+@RequestMapping("/api/review")
 public class ReviewController {
 
     private final ReviewService reviewService;
-
-    @Autowired
-    public ReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
 
     @PostMapping
     public ResponseEntity<String> addReview(@RequestBody ReviewDto reviewDto) {
         return reviewService.addReview(reviewDto);
     }
 
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<ReviewDto> getReview(@PathVariable("reviewId") Long reviewId) {
+        return reviewService.getReview(reviewId);
+    }
+
     @GetMapping
-    public ResponseEntity<List<ReviewDto>> getAllReviews(
-            @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "5") int size
-    ) {
+    public ResponseEntity<List<ReviewDto>> getAllReviews(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                         @RequestParam(name = "size", defaultValue = "5") int size) {
         return reviewService.getAllReviews(page, size);
     }
 
@@ -43,6 +40,4 @@ public class ReviewController {
     public ResponseEntity<String> deleteReview(@PathVariable("reviewId") Long reviewId) {
         return reviewService.deleteReview(reviewId);
     }
-
-
 }

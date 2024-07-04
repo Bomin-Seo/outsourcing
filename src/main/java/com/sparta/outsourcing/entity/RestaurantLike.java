@@ -1,6 +1,5 @@
 package com.sparta.outsourcing.entity;
 
-import com.sparta.outsourcing.enums.ContentTypeEnum;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,9 +1,8 @@
 package com.sparta.outsourcing.controller;
 
-import com.sparta.outsourcing.dto.MenuDto;
 import com.sparta.outsourcing.dto.RestaurantDto;
 import com.sparta.outsourcing.security.UserDetailsImpl;
-import com.sparta.outsourcing.service.AuthService;
+import com.sparta.outsourcing.service.LikeService;
 import com.sparta.outsourcing.service.RestaurantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +17,23 @@ import java.util.List;
 public class RestaurantController {
 
     private final RestaurantService restaurantService;
+    private final LikeService likeService;
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<String> addRestaurant(@RequestBody RestaurantDto restaurantDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return restaurantService.addRestaurant(restaurantDto, userDetails.getUser());
     }
 
-    @DeleteMapping("/delete/{restaurantId}")
+    @DeleteMapping("/{restaurantId}")
     public ResponseEntity<String> deleteRestaurant(@PathVariable("restaurantId") Long restaurantId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return restaurantService.deleteRestaurant(restaurantId, userDetails.getUser());
     }
 
     @GetMapping("/{restaurantId}")
-    public ResponseEntity<String> getRestaurant(@PathVariable("restaurantId") Long restaurantId) {
+    public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurantId") Long restaurantId) {
         return restaurantService.getRestaurant(restaurantId);
     }
+
     @PatchMapping("/{restaurantId}")
     public ResponseEntity<String> updateRestaurant(@PathVariable("restaurantId") Long restaurantId, @AuthenticationPrincipal UserDetailsImpl userDetails, @RequestBody RestaurantDto restaurantDto) {
         return restaurantService.updateRestaurant(restaurantId,userDetails.getUser(), restaurantDto);
@@ -44,5 +45,4 @@ public class RestaurantController {
             @RequestParam(name = "size", defaultValue = "5") int size) {
         return restaurantService.getAllRestaurants(page, size);
     }
-
 }

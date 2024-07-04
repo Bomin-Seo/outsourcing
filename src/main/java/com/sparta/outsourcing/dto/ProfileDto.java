@@ -15,13 +15,8 @@ public class ProfileDto {
 
     @NotBlank(message = "필수로 입력해야됩니다.")
     private String nickname;
-
     private String userinfo;
 
-    public ProfileDto(String nickname, String userinfo) {
-        this.nickname = nickname;
-        this.userinfo = userinfo;
-    }
     public ProfileDto(String nickname, String userinfo, String password) {
         this.nickname = nickname;
         this.userinfo = userinfo;

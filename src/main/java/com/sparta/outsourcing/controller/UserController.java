@@ -6,7 +6,6 @@ import com.sparta.outsourcing.dto.UserDto;
 import com.sparta.outsourcing.exception.SignUpFailureException;
 import com.sparta.outsourcing.security.UserDetailsImpl;
 import com.sparta.outsourcing.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,16 +34,22 @@ public class UserController {
             StringBuilder errorMessage = new StringBuilder();
             for (FieldError fieldError : fieldErrors) {
                 log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
-                errorMessage.append(fieldError.getDefaultMessage()).append(" ");
+                errorMessage.append(fieldError.getDefaultMessage());
             }
             throw new SignUpFailureException(errorMessage.toString().trim());
         }
         return userService.signUp(userDto, roleId);
     }
 
+
     @GetMapping("/{userId}")
     public ResponseEntity<ProfileResponseDto> getProfile(@PathVariable("userId") Long userId) {
         return userService.getProfile(userId);
+    }
+
+    @GetMapping("/top10")
+    public List<ProfileResponseDto> getTop10User() {
+        return userService.getTop10User();
     }
 
     @PatchMapping("/{userId}")
@@ -50,7 +57,8 @@ public class UserController {
     UserDetailsImpl userDetails) {
         return userService.updateProfile(userId, profileDto, userDetails.getUser());
     }
-    @PostMapping("/delete/{userId}")
+
+    @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable("userId") Long userId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return userService.deleteUser(userId, userDetails.getUser());
     }
